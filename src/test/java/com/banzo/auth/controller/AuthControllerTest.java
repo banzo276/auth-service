@@ -1,8 +1,10 @@
 package com.banzo.auth.controller;
 
+import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.model.LoginRequest;
 import com.banzo.auth.model.User;
 import com.banzo.auth.model.UserPrincipal;
+import com.banzo.auth.service.AuthServiceImpl;
 import com.banzo.auth.service.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -29,10 +31,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
 
     @MockBean
+    AuthServiceImpl authService;
+
+    @MockBean
     UserServiceImpl userService;
 
     @MockBean
     AuthenticationManager authenticationManager;
+
+    @MockBean
+    JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     MockMvc mockMvc;
