@@ -1,5 +1,6 @@
 package com.banzo.auth.service;
 
+import com.banzo.auth.exception.BadRequestException;
 import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.model.User;
 import org.slf4j.Logger;
@@ -8,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -17,6 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private UserService userService;
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider jwtTokenProvider;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -33,8 +38,13 @@ public class AuthServiceImpl implements AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
-    public String login(String username, String password) throws Exception {
+    public String login(String username, String password) {
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -44,8 +54,26 @@ public class AuthServiceImpl implements AuthService {
 
             return token;
         } catch (Exception e) {
-            throw new Exception(e);
+            throw new BadRequestException("Invalid credentials");
         }
+    }
+
+    @Override
+    public String register(User user) {
+        if (userService.findByUsername(user.getUsername()).isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userService.saveOrUpdate(user);
+            return jwtTokenProvider.generateToken(user.getUsername(), user.getRoles());
+        } else {
+            throw new BadRequestException("Username is already in use");
+        }
+    }
+
+    @Override
+    public User currentUser(HttpServletRequest request) {
+        return userService.findByUsername(
+                jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(request)))
+                .get();
     }
 
     @Scheduled(fixedRate = 60000)
