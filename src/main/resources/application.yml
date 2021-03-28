@@ -3,3 +3,7 @@ server:
 spring:
   profiles:
     active: h2
+auth:
+  jwt:
+    secret-key: hgdyr332
+    expiration-ms: 3600000

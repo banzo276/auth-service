@@ -1,34 +1,41 @@
 package com.banzo.auth.controller;
 
 import com.banzo.auth.model.LoginRequest;
+import com.banzo.auth.model.RegistrationRequest;
+import com.banzo.auth.model.User;
+import com.banzo.auth.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private AuthenticationManager authenticationManager;
+    private AuthService authService;
 
-    public AuthController(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        String jwtToken = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+    }
 
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (Exception exception) {
-             // throw new UsernameNotFoundException("Invalid username/password");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody RegistrationRequest registrationRequest) {
+        String jwtToken = authService.register(
+                registrationRequest.getUsername(), registrationRequest.getPassword());
+        return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
+    }
 
-        return ResponseEntity.ok().build();
+    @GetMapping("/user")
+    public ResponseEntity<User> currentUser(HttpServletRequest request) {
+        return new ResponseEntity<>(authService.currentUser(request), HttpStatus.OK);
     }
 }
