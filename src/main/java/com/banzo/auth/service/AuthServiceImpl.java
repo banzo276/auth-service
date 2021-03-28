@@ -45,7 +45,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(String username, String password) {
-
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     username, password));

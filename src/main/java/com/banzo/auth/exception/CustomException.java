@@ -1,14 +1,16 @@
 package com.banzo.auth.exception;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 
-public abstract class CustomException extends RuntimeException {
+@JsonIgnoreProperties(value = { "cause", "stackTrace", "suppressed", "localizedMessage" })
+public class CustomException extends RuntimeException {
 
-    private HttpStatus statusCode;
+    private Integer statusCode;
     private String message;
 
-    public CustomException(HttpStatus statusCode, String message) {
-        this.statusCode = statusCode;
+    public CustomException(HttpStatus httpStatusCode, String message) {
+        this.statusCode = httpStatusCode.value();
         this.message = message;
     }
 
@@ -17,7 +19,7 @@ public abstract class CustomException extends RuntimeException {
         return message;
     }
 
-    public HttpStatus getStatusCode() {
+    public Integer getStatusCode() {
         return statusCode;
     }
 }

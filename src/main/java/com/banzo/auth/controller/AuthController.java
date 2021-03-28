@@ -1,6 +1,5 @@
 package com.banzo.auth.controller;
 
-import com.banzo.auth.exception.CustomException;
 import com.banzo.auth.model.LoginRequest;
 import com.banzo.auth.model.RegistrationRequest;
 import com.banzo.auth.model.Role;
@@ -26,13 +25,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-
-        try {
-            String jwtToken = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-            return new ResponseEntity<>(jwtToken, HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(e.getMessage(), e.getStatusCode());
-        }
+        String jwtToken = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -46,12 +40,8 @@ public class AuthController {
                     .roles(Collections.singleton(Role.builder().name("ROLE_VIEWER").build()))
                     .build();
 
-        try {
-            String jwtToken = authService.register(user);
-            return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(e.getMessage(), e.getStatusCode());
-        }
+        String jwtToken = authService.register(user);
+        return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
     }
 
     @GetMapping("/user")
