@@ -2,6 +2,7 @@ package com.banzo.auth.service;
 
 import com.banzo.auth.exception.BadRequestException;
 import com.banzo.auth.jwt.JwtTokenProvider;
+import com.banzo.auth.model.Role;
 import com.banzo.auth.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private UserService userService;
+    private RoleService roleService;
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider jwtTokenProvider;
     private PasswordEncoder passwordEncoder;
@@ -26,6 +29,11 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     @Autowired
@@ -58,9 +66,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String register(User user) {
-        if (userService.findByUsername(user.getUsername()).isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public String register(String username, String password) {
+        if (userService.findByUsername(username).isEmpty()) {
+
+            String encodedPassword = passwordEncoder.encode(password);
+
+            Role defaultRole = roleService.findByName("ROLE_VIEWER").get();
+
+            User user = User.builder()
+                    .username(username)
+                    .password(encodedPassword)
+                    .enabled(true)
+                    .failedLoginAttempts(0)
+                    .roles(Collections.singleton(defaultRole))
+                    .build();
+
             userService.saveOrUpdate(user);
             return jwtTokenProvider.generateToken(user.getUsername(), user.getRoles());
         } else {

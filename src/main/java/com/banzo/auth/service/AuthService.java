@@ -8,6 +8,6 @@ public interface AuthService {
 
     void resetFailedLogins();
     String login(String username, String password);
-    String register(User user);
+    String register(String username, String password);
     User currentUser(HttpServletRequest request);
 }

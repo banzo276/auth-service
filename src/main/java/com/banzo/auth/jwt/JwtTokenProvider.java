@@ -1,5 +1,6 @@
 package com.banzo.auth.jwt;
 
+import com.banzo.auth.exception.BadRequestException;
 import com.banzo.auth.model.Role;
 import com.banzo.auth.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -60,12 +61,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public Boolean validateToken(String token) throws Exception {
+    public Boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
-            throw new Exception("Invalid or expired JWT token");
+            throw new BadRequestException("Invalid or expired JWT token");
         }
     }
 
