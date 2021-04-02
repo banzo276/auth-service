@@ -1,7 +1,7 @@
 package com.banzo.auth.controller;
 
 import com.banzo.auth.jwt.JwtTokenProvider;
-import com.banzo.auth.model.LoginRequest;
+import com.banzo.auth.payload.LoginRequest;
 import com.banzo.auth.model.User;
 import com.banzo.auth.model.UserPrincipal;
 import com.banzo.auth.service.AuthServiceImpl;
