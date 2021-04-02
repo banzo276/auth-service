@@ -4,6 +4,7 @@ import com.banzo.auth.exception.BadRequestException;
 import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.model.Role;
 import com.banzo.auth.model.User;
+import com.banzo.auth.payload.JwtResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,21 +53,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(String username, String password) {
+    public JwtResponse login(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     username, password));
             User authUser = userService.findByUsername(username).get();
             String token = jwtTokenProvider.generateToken(username, authUser.getRoles());
 
-            return token;
+            return new JwtResponse(token, authUser.getId(), authUser.getUsername());
         } catch (Exception e) {
             throw new BadRequestException("Invalid credentials");
         }
     }
 
     @Override
-    public String register(String username, String password) {
+    public JwtResponse register(String username, String password) {
         if (userService.findByUsername(username).isEmpty()) {
 
             String encodedPassword = passwordEncoder.encode(password);
@@ -82,7 +83,8 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
             userService.saveOrUpdate(user);
-            return jwtTokenProvider.generateToken(user.getUsername(), user.getRoles());
+            String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRoles());
+            return new JwtResponse(token, user.getId(), user.getUsername());
         } else {
             throw new BadRequestException("Username is already in use");
         }

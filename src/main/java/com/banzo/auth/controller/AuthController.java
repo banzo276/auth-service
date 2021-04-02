@@ -1,9 +1,11 @@
 package com.banzo.auth.controller;
 
-import com.banzo.auth.model.LoginRequest;
-import com.banzo.auth.model.RegistrationRequest;
-import com.banzo.auth.model.User;
+import com.banzo.auth.dto.UserDto;
+import com.banzo.auth.payload.JwtResponse;
+import com.banzo.auth.payload.LoginRequest;
+import com.banzo.auth.payload.RegistrationRequest;
 import com.banzo.auth.service.AuthService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,26 +18,30 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthController {
 
     private AuthService authService;
+    private ModelMapper modelMapper;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, ModelMapper modelMapper) {
         this.authService = authService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        String jwtToken = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
+        JwtResponse jwtResponse = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegistrationRequest registrationRequest) {
-        String jwtToken = authService.register(
+    public ResponseEntity<JwtResponse> register(@RequestBody RegistrationRequest registrationRequest) {
+        JwtResponse jwtResponse = authService.register(
                 registrationRequest.getUsername(), registrationRequest.getPassword());
-        return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
+        return new ResponseEntity<>(jwtResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<User> currentUser(HttpServletRequest request) {
-        return new ResponseEntity<>(authService.currentUser(request), HttpStatus.OK);
+    public ResponseEntity<UserDto> currentUser(HttpServletRequest request) {
+        return new ResponseEntity<>(modelMapper.map(
+                authService.currentUser(request), UserDto.class),
+                HttpStatus.OK);
     }
 }
