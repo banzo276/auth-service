@@ -2,8 +2,8 @@ package com.banzo.auth.event;
 
 import com.banzo.auth.model.User;
 import com.banzo.auth.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,21 +11,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 public class LoginSuccessEventHandler implements ApplicationListener<LoginSuccessEvent> {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-    private UserService userService;
-
-    public LoginSuccessEventHandler(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @Override
     public void onApplicationEvent(LoginSuccessEvent event) {
 
         Authentication authentication = (Authentication) event.getSource();
-        logger.info("Authentication successful");
+        log.info("Authentication successful");
         updateUserAccount(authentication);
     }
 
@@ -38,7 +35,7 @@ public class LoginSuccessEventHandler implements ApplicationListener<LoginSucces
             User foundUser = user.get();
 
             if (foundUser.getFailedLoginAttempts() > 0) {
-                logger.info("Login successful, resetting failed attempts");
+                log.info("Login successful, resetting failed attempts");
                 foundUser.setFailedLoginAttempts(0);
 
                 userService.saveOrUpdate(foundUser);

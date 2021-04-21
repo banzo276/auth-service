@@ -5,6 +5,7 @@ import com.banzo.auth.payload.JwtResponse;
 import com.banzo.auth.payload.LoginRequest;
 import com.banzo.auth.payload.RegistrationRequest;
 import com.banzo.auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,18 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin("http://localhost:4200")
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private AuthService authService;
-    private ModelMapper modelMapper;
-
-    public AuthController(AuthService authService, ModelMapper modelMapper) {
-        this.authService = authService;
-        this.modelMapper = modelMapper;
-    }
+    private final AuthService authService;
+    private final ModelMapper modelMapper;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {

@@ -4,43 +4,32 @@ import com.banzo.auth.event.LoginFailureEvent;
 import com.banzo.auth.event.LoginFailureEventPublisher;
 import com.banzo.auth.event.LoginSuccessEvent;
 import com.banzo.auth.event.LoginSuccessEventPublisher;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+@Slf4j
+@RequiredArgsConstructor
 @Aspect
 @Component
 public class LoginAspect {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
-    private LoginFailureEventPublisher loginFailureEventPublisher;
-    private LoginSuccessEventPublisher loginSuccessEventPublisher;
-
-    @Autowired
-    public void setLoginFailureEventPublisher(LoginFailureEventPublisher loginFailureEventPublisher) {
-        this.loginFailureEventPublisher = loginFailureEventPublisher;
-    }
-
-    @Autowired
-    public void setLoginSuccessEventPublisher(LoginSuccessEventPublisher loginSuccessEventPublisher) {
-        this.loginSuccessEventPublisher = loginSuccessEventPublisher;
-    }
+    private final LoginFailureEventPublisher loginFailureEventPublisher;
+    private final LoginSuccessEventPublisher loginSuccessEventPublisher;
 
     @Pointcut("execution(* org.springframework.security.authentication.AuthenticationProvider.authenticate(..))")
     public void processAuthentication(){}
 
     @Before("processAuthentication() && args(authentication)")
     public void logBeforeAuthentication(Authentication authentication) {
-        logger.info("Trying to authenticate user: " + (String) authentication.getPrincipal());
+        log.info("Trying to authenticate user: " + (String) authentication.getPrincipal());
     }
 
     @AfterReturning(value = "processAuthentication()", returning = "authentication")
     public void logAuthenticationSuccess(Authentication authentication) {
-        logger.info("User is authenticated: " + authentication.isAuthenticated());
+        log.info("User is authenticated: " + authentication.isAuthenticated());
         loginSuccessEventPublisher.publish(new LoginSuccessEvent(authentication));
     }
 
