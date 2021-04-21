@@ -77,8 +77,6 @@ public class AuthServiceImpl implements AuthService {
             User user = User.builder()
                     .username(username)
                     .password(encodedPassword)
-                    .enabled(true)
-                    .failedLoginAttempts(0)
                     .roles(Collections.singleton(defaultRole))
                     .build();
 
