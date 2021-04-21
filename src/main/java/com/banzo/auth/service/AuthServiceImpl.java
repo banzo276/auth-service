@@ -5,9 +5,8 @@ import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.model.Role;
 import com.banzo.auth.model.User;
 import com.banzo.auth.payload.JwtResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,40 +16,16 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-    private UserService userService;
-    private RoleService roleService;
-    private AuthenticationManager authenticationManager;
-    private JwtTokenProvider jwtTokenProvider;
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    @Autowired
-    public void setRoleService(RoleService roleService) {
-        this.roleService = roleService;
-    }
-
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-    @Autowired
-    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserService userService;
+    private final RoleService roleService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public JwtResponse login(String username, String password) {
@@ -99,13 +74,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void resetFailedLogins() {
 
-        logger.info("Checking for locked accounts");
+        log.info("Checking for locked accounts");
 
         Iterable<User> users = userService.findAll();
 
         users.forEach(user -> {
             if (!user.getEnabled() && user.getFailedLoginAttempts() > 0) {
-                logger.info("Resetting failed attempts for user: " + user.getUsername());
+                log.info("Resetting failed attempts for user: " + user.getUsername());
                 user.setFailedLoginAttempts(0);
                 user.setEnabled(true);
                 userService.saveOrUpdate(user);
