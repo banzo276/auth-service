@@ -44,7 +44,7 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles`(name)
 VALUES
-('ROLE_USER'),
+('ROLE_VIEWER'),
 ('ROLE_ADMIN');
 
 --
