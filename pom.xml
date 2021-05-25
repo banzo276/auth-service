@@ -19,6 +19,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<docker.image.prefix>banzo276</docker.image.prefix>
 		<docker.image.name>${project.artifactId}</docker.image.name>
+		<org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -65,9 +66,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>2.4.0</version>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -97,6 +98,30 @@
 						<enabled>true</enabled>
 						<includeLayerTools>true</includeLayerTools>
 					</layers>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${org.mapstruct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<compilerArg>
+							-Amapstruct.defaultComponentModel=spring
+						</compilerArg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
