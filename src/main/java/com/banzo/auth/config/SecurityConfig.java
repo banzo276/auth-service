@@ -3,7 +3,6 @@ package com.banzo.auth.config;
 import com.banzo.auth.jwt.JwtTokenFilterConfig;
 import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,10 +67,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         return passwordEncoder;
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
     }
 }

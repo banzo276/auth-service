@@ -1,7 +1,9 @@
 package com.banzo.auth.service;
 
+import com.banzo.auth.dto.UserDto;
 import com.banzo.auth.exception.BadRequestException;
 import com.banzo.auth.jwt.JwtTokenProvider;
+import com.banzo.auth.mappers.UserMapper;
 import com.banzo.auth.model.Role;
 import com.banzo.auth.model.User;
 import com.banzo.auth.payload.JwtResponse;
@@ -26,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public JwtResponse login(String username, String password) {
@@ -64,10 +67,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User currentUser(HttpServletRequest request) {
-        return userService.findByUsername(
+    public UserDto currentUser(HttpServletRequest request) {
+        return userMapper.userToUserDto(userService.findByUsername(
                 jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(request)))
-                .get();
+                .get());
     }
 
     @Scheduled(fixedRate = 60000)

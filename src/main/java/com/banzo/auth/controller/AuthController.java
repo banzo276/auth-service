@@ -6,7 +6,6 @@ import com.banzo.auth.payload.LoginRequest;
 import com.banzo.auth.payload.RegistrationRequest;
 import com.banzo.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthController {
 
     private final AuthService authService;
-    private final ModelMapper modelMapper;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
@@ -37,8 +35,7 @@ public class AuthController {
 
     @GetMapping("/user")
     public ResponseEntity<UserDto> currentUser(HttpServletRequest request) {
-        return new ResponseEntity<>(modelMapper.map(
-                authService.currentUser(request), UserDto.class),
+        return new ResponseEntity<>(authService.currentUser(request),
                 HttpStatus.OK);
     }
 }
