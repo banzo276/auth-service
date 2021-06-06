@@ -12,3 +12,9 @@ management:
     web:
       exposure:
         include: "*"
+info:
+  app:
+    encoding: UTF-8
+    java:
+      source: 11
+      target: 11
