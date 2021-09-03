@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Object> handleCustomException(CustomException exception) {
-        return new ResponseEntity<>(new Error(exception.getStatus(),
-                exception.getMessage()),
-                exception.getStatus());
-    }
+  @ExceptionHandler(CustomException.class)
+  public ResponseEntity<Object> handleCustomException(CustomException exception) {
+    return new ResponseEntity<>(
+        new Error(exception.getStatus(), exception.getMessage()), exception.getStatus());
+  }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception exception) {
-        return new ResponseEntity<>(new Error(),
-                HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleException(Exception exception) {
+    return new ResponseEntity<>(new Error(), HttpStatus.BAD_REQUEST);
+  }
 }

@@ -25,56 +25,57 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${auth.jwt.secret-key}")
-    private String secretKey;
+  @Value("${auth.jwt.secret-key}")
+  private String secretKey;
 
-    @Value("${auth.jwt.expiration-ms}")
-    private Long validityInMs;
+  @Value("${auth.jwt.expiration-ms}")
+  private Long validityInMs;
 
-    private final UserService userService;
+  private final UserService userService;
 
-    public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+  public String resolveToken(HttpServletRequest req) {
+    String bearerToken = req.getHeader("Authorization");
+    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+      return bearerToken.substring(7);
     }
+    return null;
+  }
 
-    public String generateToken(String subject, Collection<Role> roles) {
+  public String generateToken(String subject, Collection<Role> roles) {
 
-        Claims claims = Jwts.claims().setSubject(subject);
-        claims.put("auth", roles
-                .stream()
-                .map(s -> new SimpleGrantedAuthority(s.getName()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+    Claims claims = Jwts.claims().setSubject(subject);
+    claims.put(
+        "auth",
+        roles.stream()
+            .map(s -> new SimpleGrantedAuthority(s.getName()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
-                .compact();
+    return Jwts.builder()
+        .setClaims(claims)
+        .setSubject(subject)
+        .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
+        .signWith(SignatureAlgorithm.HS512, secretKey)
+        .compact();
+  }
+
+  public Boolean validateToken(String token) {
+    try {
+      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      return true;
+    } catch (JwtException e) {
+      throw new BadRequestException("Invalid or expired JWT token");
     }
+  }
 
-    public Boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            throw new BadRequestException("Invalid or expired JWT token");
-        }
-    }
+  public Authentication getAuthentication(String token) {
+    UserDetails userDetails = userService.loadUserByUsername(getUsername(token));
 
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userService.loadUserByUsername(getUsername(token));
+    return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+  }
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-    }
+  public String getUsername(String token) {
+    return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+  }
 }

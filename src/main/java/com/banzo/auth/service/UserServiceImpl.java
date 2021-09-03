@@ -15,35 +15,38 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    @Transactional
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
+  @Override
+  @Transactional
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
+  }
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  @Override
+  @Transactional
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> {
-                return new UsernameNotFoundException(username);
-        });
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(
+                () -> {
+                  return new UsernameNotFoundException(username);
+                });
 
-        return new UserPrincipal(user);
-    }
+    return new UserPrincipal(user);
+  }
 
-    @Override
-    @Transactional
-    public User saveOrUpdate(User user) {
-        return userRepository.save(user);
-    }
+  @Override
+  @Transactional
+  public User saveOrUpdate(User user) {
+    return userRepository.save(user);
+  }
 
-    @Override
-    @Transactional
-    public Iterable<User> findAll() {
-        return userRepository.findAll();
-    }
+  @Override
+  @Transactional
+  public Iterable<User> findAll() {
+    return userRepository.findAll();
+  }
 }

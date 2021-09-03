@@ -16,30 +16,30 @@ import java.util.Optional;
 @Component
 public class LoginSuccessEventHandler implements ApplicationListener<LoginSuccessEvent> {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @Override
-    public void onApplicationEvent(LoginSuccessEvent event) {
+  @Override
+  public void onApplicationEvent(LoginSuccessEvent event) {
 
-        Authentication authentication = (Authentication) event.getSource();
-        log.info("Authentication successful");
-        updateUserAccount(authentication);
+    Authentication authentication = (Authentication) event.getSource();
+    log.info("Authentication successful");
+    updateUserAccount(authentication);
+  }
+
+  private void updateUserAccount(Authentication authentication) {
+
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    Optional<User> user = userService.findByUsername(userDetails.getUsername());
+
+    if (user.isPresent()) {
+      User foundUser = user.get();
+
+      if (foundUser.getFailedLoginAttempts() > 0) {
+        log.info("Login successful, resetting failed attempts");
+        foundUser.setFailedLoginAttempts(0);
+
+        userService.saveOrUpdate(foundUser);
+      }
     }
-
-    private void updateUserAccount(Authentication authentication) {
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Optional<User> user = userService.findByUsername(userDetails.getUsername());
-
-        if (user.isPresent()) {
-            User foundUser = user.get();
-
-            if (foundUser.getFailedLoginAttempts() > 0) {
-                log.info("Login successful, resetting failed attempts");
-                foundUser.setFailedLoginAttempts(0);
-
-                userService.saveOrUpdate(foundUser);
-            }
-        }
-    }
+  }
 }

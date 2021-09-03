@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 public class UserDto {
 
-    private Long id;
-    private String username;
-    private Set<RoleDto> roles;
+  private Long id;
+  private String username;
+  private Set<RoleDto> roles;
 }

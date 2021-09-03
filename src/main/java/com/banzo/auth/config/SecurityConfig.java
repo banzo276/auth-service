@@ -18,55 +18,59 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        // securedEnabled = true,
-        // jsr250Enabled = true,
-        prePostEnabled = true)
+    // securedEnabled = true,
+    // jsr250Enabled = true,
+    prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private UserService userService;
-    private JwtTokenProvider jwtTokenProvider;
+  private UserService userService;
+  private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
 
-    @Autowired
-    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+  @Autowired
+  public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
+    this.jwtTokenProvider = jwtTokenProvider;
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
 
-        http.cors().and().csrf().disable();
-        http.headers().frameOptions().sameOrigin();
-        http.authorizeRequests()
-            .antMatchers("/actuator/**").permitAll()
-            .antMatchers("/api/auth/login").permitAll()
-            .antMatchers("/api/auth/register").permitAll()
-            .antMatchers("/api/auth/user").permitAll()
-            .antMatchers("/h2-console/**/**").permitAll()
-            .anyRequest().authenticated();
+    http.cors().and().csrf().disable();
+    http.headers().frameOptions().sameOrigin();
+    http.authorizeRequests()
+        .antMatchers("/actuator/**")
+        .permitAll()
+        .antMatchers("/api/auth/login")
+        .permitAll()
+        .antMatchers("/api/auth/register")
+        .permitAll()
+        .antMatchers("/api/auth/user")
+        .permitAll()
+        .antMatchers("/h2-console/**/**")
+        .permitAll()
+        .anyRequest()
+        .authenticated();
 
-        http.apply(new JwtTokenFilterConfig(jwtTokenProvider));
-    }
+    http.apply(new JwtTokenFilterConfig(jwtTokenProvider));
+  }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
-    }
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
+  }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-
-        PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        return passwordEncoder;
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
 }

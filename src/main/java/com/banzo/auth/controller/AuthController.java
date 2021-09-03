@@ -18,24 +18,25 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
-        JwtResponse jwtResponse = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
-    }
+  @PostMapping("/login")
+  public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
+    JwtResponse jwtResponse =
+        authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+    return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
+  }
 
-    @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@RequestBody RegistrationRequest registrationRequest) {
-        JwtResponse jwtResponse = authService.register(
-                registrationRequest.getUsername(), registrationRequest.getPassword());
-        return new ResponseEntity<>(jwtResponse, HttpStatus.CREATED);
-    }
+  @PostMapping("/register")
+  public ResponseEntity<JwtResponse> register(
+      @RequestBody RegistrationRequest registrationRequest) {
+    JwtResponse jwtResponse =
+        authService.register(registrationRequest.getUsername(), registrationRequest.getPassword());
+    return new ResponseEntity<>(jwtResponse, HttpStatus.CREATED);
+  }
 
-    @GetMapping("/user")
-    public ResponseEntity<UserDto> currentUser(HttpServletRequest request) {
-        return new ResponseEntity<>(authService.currentUser(request),
-                HttpStatus.OK);
-    }
+  @GetMapping("/user")
+  public ResponseEntity<UserDto> currentUser(HttpServletRequest request) {
+    return new ResponseEntity<>(authService.currentUser(request), HttpStatus.OK);
+  }
 }

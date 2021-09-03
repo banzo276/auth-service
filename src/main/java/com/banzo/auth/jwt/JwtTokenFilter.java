@@ -14,24 +14,25 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+  private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-        String token = jwtTokenProvider.resolveToken(request);
-        try{
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            return;
-        }
-
-        filterChain.doFilter(request, response);
+    String token = jwtTokenProvider.resolveToken(request);
+    try {
+      if (token != null && jwtTokenProvider.validateToken(token)) {
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
+    } catch (Exception e) {
+      SecurityContextHolder.clearContext();
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+      return;
     }
+
+    filterChain.doFilter(request, response);
+  }
 }

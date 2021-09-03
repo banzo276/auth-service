@@ -12,11 +12,11 @@ import java.util.Optional;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-    @Override
-    @Transactional
-    public Optional<Role> findByName(String name) {
-        return roleRepository.findByName(name);
-    }
+  @Override
+  @Transactional
+  public Optional<Role> findByName(String name) {
+    return roleRepository.findByName(name);
+  }
 }

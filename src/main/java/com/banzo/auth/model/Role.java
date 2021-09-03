@@ -14,18 +14,21 @@ import java.util.Set;
 @Table(name = "roles")
 public class Role {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
+  private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+  @ManyToMany(mappedBy = "roles")
+  private Set<User> users;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "roles_authorities",
-            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
-    private Set<Authority> authorities;
+  @ManyToMany(
+      fetch = FetchType.EAGER,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @JoinTable(
+      name = "roles_authorities",
+      joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
+  private Set<Authority> authorities;
 }

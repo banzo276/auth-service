@@ -8,19 +8,19 @@ import org.springframework.http.HttpStatus;
 @Setter
 public class Error {
 
-    private Integer status;
-    private String message;
+  private Integer status;
+  private String message;
 
-    public Error() {
-        this(HttpStatus.BAD_REQUEST);
-    }
+  public Error() {
+    this(HttpStatus.BAD_REQUEST);
+  }
 
-    public Error(HttpStatus httpStatus) {
-        this(httpStatus, "Something went wrong");
-    }
+  public Error(HttpStatus httpStatus) {
+    this(httpStatus, "Something went wrong");
+  }
 
-    public Error(HttpStatus httpStatus, String message) {
-        this.status = httpStatus.value();
-        this.message = message;
-    }
+  public Error(HttpStatus httpStatus, String message) {
+    this.status = httpStatus.value();
+    this.message = message;
+  }
 }

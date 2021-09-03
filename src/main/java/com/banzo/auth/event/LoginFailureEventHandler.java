@@ -15,31 +15,31 @@ import java.util.Optional;
 @Component
 public class LoginFailureEventHandler implements ApplicationListener<LoginFailureEvent> {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @Override
-    public void onApplicationEvent(LoginFailureEvent event) {
+  @Override
+  public void onApplicationEvent(LoginFailureEvent event) {
 
-        Authentication authentication = (Authentication) event.getSource();
-        log.info("Authentication failed for user: " + (String) authentication.getPrincipal());
-        updateUserAccount(authentication);
+    Authentication authentication = (Authentication) event.getSource();
+    log.info("Authentication failed for user: " + (String) authentication.getPrincipal());
+    updateUserAccount(authentication);
+  }
+
+  private void updateUserAccount(Authentication authentication) {
+
+    Optional<User> user = userService.findByUsername((String) authentication.getPrincipal());
+
+    if (user.isPresent()) {
+      User foundUser = user.get();
+      foundUser.setFailedLoginAttempts(foundUser.getFailedLoginAttempts() + 1);
+      log.info("Invalid password, failed login attempts: " + foundUser.getFailedLoginAttempts());
+
+      if (foundUser.getFailedLoginAttempts() > 5) {
+        foundUser.setEnabled(false);
+        log.info("User account: " + foundUser.getUsername() + " is locked.");
+      }
+
+      userService.saveOrUpdate(foundUser);
     }
-
-    private void updateUserAccount(Authentication authentication) {
-
-        Optional<User> user = userService.findByUsername((String) authentication.getPrincipal());
-
-        if (user.isPresent()) {
-            User foundUser = user.get();
-            foundUser.setFailedLoginAttempts(foundUser.getFailedLoginAttempts() + 1);
-            log.info("Invalid password, failed login attempts: " + foundUser.getFailedLoginAttempts());
-
-            if (foundUser.getFailedLoginAttempts() > 5) {
-                foundUser.setEnabled(false);
-                log.info("User account: " + foundUser.getUsername() + " is locked.");
-            }
-
-            userService.saveOrUpdate(foundUser);
-        }
-    }
+  }
 }
