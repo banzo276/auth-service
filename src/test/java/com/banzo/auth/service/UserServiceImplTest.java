@@ -33,8 +33,8 @@ class UserServiceImplTest {
         User user = new User();
         given(userRepository.findByUsername(anyString())).willReturn(Optional.of(user));
 
-        Optional<User> foundUser = userService.findByUsername("admin");
-        assertThat(foundUser).isPresent();
+        User foundUser = userService.findByUsername("admin");
+        assertThat(foundUser).isNotNull();
 
         then(userRepository).should().findByUsername("admin");
     }
