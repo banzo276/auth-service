@@ -1,15 +1,13 @@
 package com.banzo.auth.payload;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 @Builder
 public class JwtResponse {
 
-    private String token;
-    private Long id;
-    private String username;
+  String token;
+  Long userId;
+  String username;
 }

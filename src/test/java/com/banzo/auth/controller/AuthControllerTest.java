@@ -5,7 +5,7 @@ import com.banzo.auth.payload.LoginRequest;
 import com.banzo.auth.model.User;
 import com.banzo.auth.model.UserPrincipal;
 import com.banzo.auth.service.AuthServiceImpl;
-import com.banzo.auth.service.UserServiceImpl;
+import com.banzo.auth.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -30,55 +30,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 class AuthControllerTest {
 
-    @MockBean
-    AuthServiceImpl authService;
+  @MockBean AuthServiceImpl authService;
 
-    @MockBean
-    UserServiceImpl userService;
+  @MockBean UserService userService;
 
-    @MockBean
-    AuthenticationManager authenticationManager;
+  @MockBean AuthenticationManager authenticationManager;
 
-    @MockBean
-    JwtTokenProvider jwtTokenProvider;
+  @MockBean JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
-    @AfterEach
-    void tearDown() {
-        reset(userService);
-    }
+  @AfterEach
+  void tearDown() {
+    reset(userService);
+  }
 
-    @Test
-    void login() throws Exception {
+  @Test
+  void login() throws Exception {
 
-        LoginRequest loginRequest = new LoginRequest("admin", "admin");
-        User user = getUser();
-        UserDetails userDetails = new UserPrincipal(user);
-        String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
+    var loginRequest = LoginRequest.builder().username("admin").password("admin").build();
+    User user = getUser();
+    UserDetails userDetails = new UserPrincipal(user);
+    String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
 
-        given(authenticationManager.authenticate(any())).willReturn(
-                new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword()));
+    given(authenticationManager.authenticate(any()))
+        .willReturn(
+            new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword()));
 
-        mockMvc.perform(post("/api/auth/login")
+    mockMvc
+        .perform(
+            post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(loginRequestJson)
                 .with(csrf()))
-                .andExpect(status().isOk());
-    }
+        .andExpect(status().isOk());
+  }
 
-    private User getUser() {
+  private User getUser() {
 
-        User user = User.builder()
-                .id(1L)
-                .username("admin")
-                .password("admin")
-                .build();
+    var user = User.builder().id(1L).username("admin").password("admin").build();
 
-        return user;
-    }
+    return user;
+  }
 }

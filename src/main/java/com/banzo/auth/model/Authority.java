@@ -14,12 +14,12 @@ import java.util.Set;
 @Table(name = "authorities")
 public class Authority {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String permission;
+  private String permission;
 
-    @ManyToMany(mappedBy = "authorities")
-    private Set<Role> roles;
+  @ManyToMany(mappedBy = "authorities")
+  private Set<Role> roles;
 }

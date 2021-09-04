@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginFailureEventPublisher implements ApplicationEventPublisherAware {
 
-    private ApplicationEventPublisher publisher;
+  private ApplicationEventPublisher publisher;
 
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.publisher = applicationEventPublisher;
-    }
+  @Override
+  public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    this.publisher = applicationEventPublisher;
+  }
 
-    public void publish(LoginFailureEvent event) {
-        this.publisher.publishEvent(event);
-    }
+  public void publish(LoginFailureEvent event) {
+    this.publisher.publishEvent(event);
+  }
 }

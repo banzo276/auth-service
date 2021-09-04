@@ -7,3 +7,14 @@ auth:
   jwt:
     secret-key: hgdyr332
     expiration-ms: 3600000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+info:
+  app:
+    encoding: UTF-8
+    java:
+      source: 11
+      target: 11

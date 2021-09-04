@@ -1,14 +1,11 @@
 package com.banzo.auth.payload;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
 public class LoginRequest {
 
-    private String username;
-    private String password;
+  String username;
+  String password;
 }
