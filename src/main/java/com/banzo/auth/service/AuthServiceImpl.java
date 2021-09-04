@@ -3,11 +3,13 @@ package com.banzo.auth.service;
 import com.banzo.auth.dto.UserDto;
 import com.banzo.auth.exception.AccessDeniedException;
 import com.banzo.auth.exception.BadRequestException;
+import com.banzo.auth.exception.RecordNotFoundException;
 import com.banzo.auth.jwt.JwtTokenProvider;
 import com.banzo.auth.mappers.UserMapper;
 import com.banzo.auth.model.Role;
 import com.banzo.auth.model.User;
 import com.banzo.auth.payload.JwtResponse;
+import com.banzo.auth.repository.RoleRepository;
 import com.banzo.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -26,16 +29,17 @@ import java.util.Collections;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-  private final RoleService roleService;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
 
   private static final String BAD_CREDENTIALS = "Invalid credentials";
   private static final String DEFAULT_ROLE = "ROLE_VIEWER";
 
+  @Transactional
   @Override
   public JwtResponse login(String username, String password) {
     try {
@@ -60,12 +64,17 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
+  @Transactional
   @Override
   public JwtResponse register(String username, String password) {
     if (userRepository.findByUsername(username).isEmpty()) {
 
       String encodedPassword = passwordEncoder.encode(password);
-      Role defaultRole = roleService.findByName(DEFAULT_ROLE);
+      Role defaultRole =
+          roleRepository
+              .findByName(DEFAULT_ROLE)
+              .orElseThrow(
+                  () -> new RecordNotFoundException("Role not found, role name: " + DEFAULT_ROLE));
 
       User user =
           userRepository.save(
@@ -86,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
+  @Transactional(readOnly = true)
   @Override
   public UserDto currentUser(HttpServletRequest request) {
     return userMapper.userToUserDto(
@@ -95,6 +105,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Scheduled(fixedRate = 60000)
+  @Transactional
   @Override
   public void resetFailedLogins() {
 

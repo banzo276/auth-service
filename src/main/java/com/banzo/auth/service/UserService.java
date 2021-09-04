@@ -1,13 +1,26 @@
 package com.banzo.auth.service;
 
-import com.banzo.auth.model.User;
+import com.banzo.auth.exception.RecordNotFoundException;
+import com.banzo.auth.model.UserPrincipal;
+import com.banzo.auth.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface UserService extends UserDetailsService {
+@RequiredArgsConstructor
+@Service
+public class UserService implements UserDetailsService {
 
-  User findByUsername(String username);
+  private final UserRepository userRepository;
 
-  User saveOrUpdate(User user);
-
-  Iterable<User> findAll();
+  @Override
+  @Transactional
+  public UserDetails loadUserByUsername(String username) {
+    return userRepository
+        .findByUsername(username)
+        .map(UserPrincipal::new)
+        .orElseThrow(() -> new RecordNotFoundException("User not found, username: " + username));
+  }
 }
